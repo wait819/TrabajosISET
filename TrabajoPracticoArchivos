@@ -1,0 +1,140 @@
+
+Archivo.cpp // Funcion principal. 
+
+#include <iostream>
+#include <fstream>
+#include <string>
+#include<locale>
+#include <cstdlib>
+#include<conio.h>
+#include "archivos.h"
+
+
+using namespace std;
+
+void mostrarMenu() {
+    cout << "\n+-----------------------------+\n";
+    cout << "¦        MENÚ DE OPCIONES     ¦\n";
+    cout << "¦-----------------------------¦\n";
+    cout << "¦  1. Agregar producto        ¦\n";
+    cout << "¦  2. Leer productos          ¦\n";
+    cout << "¦  3. Buscar producto         ¦\n";
+    cout << "¦  4. Salir                   ¦\n";
+    cout << "+-----------------------------+\n";
+    cout << "Seleccione una opción: ";
+}
+
+// Función principal
+int main() {
+	setlocale(LC_ALL, ""); // establece la configuracion que tiene determinada el sistema, si es en espaniol establecera eso.
+    system("color 5E");
+    string nombreArchivo = "inventario.txt";
+    int opcion;
+    
+    do {
+    	system("cls");
+        mostrarMenu();
+        cin >> opcion;
+        if (opcion == 1) {
+        	system("cls");
+            Producto producto;
+            cout << "Nombre del producto: ";
+            cin >> producto.nombre;
+            cout << "Precio del producto: ";
+            cin >> producto.precio;
+            cout << "Cantidad del producto: ";
+            cin >> producto.cantidad;
+            agregarProducto(nombreArchivo, producto);
+            cout<<"El producto ha sido agregado con exito!."<<endl;
+            getch();
+        } else if (opcion == 2) {
+        	system("cls");
+            leerProductos(nombreArchivo);
+            getch();
+        } else if (opcion == 3) {
+        	system("cls");
+            string nombreProducto;
+            cout << "Nombre del producto a buscar: ";
+            cin >> nombreProducto;
+            buscarProducto(nombreArchivo, nombreProducto);
+        	getch();
+        }
+        
+    } while (opcion != 4);
+    
+    cout << "Programa finalizado." << endl;
+    return 0;
+}
+
+===========================================================================
+Libreria "archivos.h"
+
+#include <iostream>
+#include <fstream>
+#include <string>
+
+using namespace std;
+
+struct Producto {
+    string nombre;
+    float precio;
+    int cantidad;
+};
+
+// Función para agregar un producto al archivo
+void agregarProducto(const string &nombreArchivo, const Producto &producto) {
+    ofstream archivo(nombreArchivo, ios::app);  // Abre el archivo en modo de anexado
+    if (!archivo) {
+        cerr << "Error al abrir el archivo para escritura." << endl;
+        return;
+    }
+    archivo << producto.nombre << " " << producto.precio << " " << producto.cantidad << endl;
+    archivo.close();
+}
+
+// Función para leer todos los productos del archivo
+void leerProductos(const string &nombreArchivo) {
+    ifstream archivo(nombreArchivo);  // Abre el archivo en modo de lectura
+    if (!archivo) {
+        cerr << "Error al abrir el archivo para lectura." << endl;
+        return;
+    }
+    
+    string nombre;
+    float precio;
+    int cantidad;
+    cout << "Inventario de productos:" << endl;
+    while (archivo >> nombre >> precio >> cantidad) {  // Lee cada línea
+        cout << "Producto: " << nombre << ", Precio: $" << precio << ", Cantidad: " << cantidad << endl;
+    }
+    archivo.close();
+}
+
+// Función para buscar un producto en el archivo
+void buscarProducto(const string &nombreArchivo, const string &nombreProducto) {
+    ifstream archivo(nombreArchivo);
+    if (!archivo) {
+        cerr << "Error al abrir el archivo para lectura." << endl;
+        return;
+    }
+    
+    string nombre;
+    float precio;
+    int cantidad;
+    bool encontrado = false;
+    while (archivo >> nombre >> precio >> cantidad) {
+        if (nombre == nombreProducto) {
+            cout << "Producto encontrado: " << endl;
+            cout << "Producto: " << nombre << ", Precio: $" << precio << ", Cantidad: " << cantidad << endl;
+            encontrado = true;
+            break;
+        }
+    }
+    archivo.close();
+    
+    if (!encontrado) {
+        cout << "Producto " << nombreProducto << " no encontrado en el inventario." << endl;
+    }
+}
+
+
